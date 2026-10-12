@@ -42,7 +42,6 @@ next-env.d.ts
 
 # local learning data
 /data
-!.env.example
 
-.vercel
-.env*
+# file mẫu biến môi trường (không chứa key) được phép commit
+!.env.example

@@ -28,8 +28,24 @@ export type DayLog = {
 export type ReadingAttempt = { date: string; score: number; total: number; seconds: number };
 
 export type EssayKind = "task1" | "task2" | "readwrite";
+
+/** Kết quả AI chấm bài. Band chỉ là ước lượng tham khảo, không phải điểm thi thật. */
+export type AiGrade = {
+  band: number;
+  criteria: { name: string; band: number; comment: string }[];
+  strengths: string[];
+  issues: { quote: string; problem: string; fix: string }[];
+  upgrades: { from: string; to: string }[];
+  nextSteps: string[];
+  model: string;
+  date: string;
+};
+
 /** kind không có = task2 (bài lưu trước khi tách mục) */
-export type Essay = { id: string; kind?: EssayKind; promptId: string; prompt: string; text: string; words: number; seconds: number; date: string };
+export type Essay = { id: string; kind?: EssayKind; promptId: string; prompt: string; text: string; words: number; seconds: number; date: string; grade?: AiGrade };
+
+/** Một lần luyện nói được chép lời và chấm. */
+export type SpeakingAttempt = { id: string; part: "p1" | "p2" | "p3"; question: string; transcript: string; seconds: number; date: string; grade?: AiGrade };
 
 /** newTopics: các chủ đề được chọn để học thẻ mới (rỗng = tất cả) */
 export type Settings = { newPerDay: number; rate: number; voice: string; newTopics: string[] };
@@ -42,6 +58,7 @@ export type Progress = {
   reading: Record<string, ReadingAttempt[]>;
   listening: Record<string, { done: boolean; notes: string }>;
   essays: Essay[];
+  speaking?: SpeakingAttempt[];
   settings: Settings;
 };
 

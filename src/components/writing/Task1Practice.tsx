@@ -1,13 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { TASK1, TASK1_GUIDE } from "@/content/writing-task1";
+import { TASK1, TASK1_GUIDE, type Task1 } from "@/content/writing-task1";
 import { Button, Card, Pill } from "../ui";
 import { EssayEditor } from "./EssayEditor";
 import { EssayHistory } from "./EssayHistory";
 import { Task1Chart } from "./Task1Chart";
 
 const KIND_LABEL = { line: "Line graph", bar: "Bar chart", pie: "Pie chart", table: "Table", process: "Process" };
+
+/** Mô tả bằng chữ dữ liệu của biểu đồ để AI đối chiếu số liệu trong bài viết. */
+function chartContext(t: Task1) {
+  const rows = t.series.map((s) => `${s.name}: ${t.categories.map((c, i) => `${c}=${s.values[i]}`).join(", ")}`);
+  return `${t.kind} "${t.title}" (unit: ${t.unit}). Categories: ${t.categories.join(", ")}.\n${rows.join("\n")}`;
+}
 
 export function Task1Practice() {
   const [id, setId] = useState(TASK1[0].id);
@@ -45,7 +51,7 @@ export function Task1Practice() {
             </div>
           </div>
         </Card>
-        <EssayEditor key={id} kind="task1" promptId={id} prompt={task.prompt} minutes={20} minWords={150} rows={12} />
+        <EssayEditor key={id} kind="task1" promptId={id} prompt={task.prompt} context={chartContext(task)} minutes={20} minWords={150} rows={12} />
         <EssayHistory kind="task1" />
       </div>
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useProgress } from "@/lib/progress";
 import type { EssayKind } from "@/lib/types";
+import { GradeCard } from "../GradeCard";
 import { Card } from "../ui";
 
 /** Danh sách bài đã viết của 1 mục (Task 1 / Task 2 / Đọc & viết). */
@@ -20,12 +21,18 @@ export function EssayHistory({ kind }: { kind: EssayKind }) {
           <li key={e.id} className="py-2">
             <button className="w-full text-left" onClick={() => setOpen(open === e.id ? null : e.id)}>
               <span className="text-muted">{e.date}</span> · <b>{e.words} từ</b> · {Math.round(e.seconds / 60)} phút ·{" "}
+              {e.grade && <b className="text-accent">Band {e.grade.band.toFixed(1)} · </b>}
               <span className="text-muted">{e.prompt.slice(0, 70)}…</span>
             </button>
             {open === e.id && (
               <div className="mt-2 rounded-lg bg-bg p-3">
                 <p className="mb-2 font-medium">{e.prompt}</p>
                 <p className="whitespace-pre-wrap">{e.text}</p>
+                {e.grade && (
+                  <div className="mt-3">
+                    <GradeCard grade={e.grade} />
+                  </div>
+                )}
               </div>
             )}
           </li>

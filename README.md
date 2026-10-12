@@ -57,5 +57,13 @@ npx vercel --prod
 | Từ vựng | ~370 flashcard từ Vocab List của khóa, ôn theo lịch lặp lại ngắt quãng |
 | Reading | 5 bài đọc band 5.5–6.5, bấm giờ, chấm điểm, giải thích tiếng Việt, bôi đen để lưu từ |
 | Listening | Chép chính tả · 29 file mp3 của khóa kèm đề · luyện số/ngày/giờ/đánh vần |
-| Writing, Speaking | Đề bài trong tài liệu khóa học (AI chấm ở Giai đoạn 2) |
+| Writing, Speaking | Đề Task 1/Task 2, cue card, ghi âm + chép lời. Nút **🤖 Chấm bằng AI** cho band ước lượng (xem mục dưới) |
 | Tài liệu khóa học | Xem docx/pdf/ảnh ngay trên web |
+
+## Giai đoạn 2 — AI chấm Writing / Speaking
+1. Lấy key miễn phí: https://aistudio.google.com/apikey
+2. Thêm vào `.env.local` (chạy trên máy): `AI_PROVIDER=gemini` và `GEMINI_API_KEY=...`
+3. Thêm cùng 2 biến vào Vercel: `npx vercel env add GEMINI_API_KEY production` (và `AI_PROVIDER`), rồi `npx vercel --prod`.
+4. Đổi nhà cung cấp: `AI_PROVIDER=groq` + `GROQ_API_KEY`, hoặc `ollama` (chỉ chạy được khi `npm run dev` trên máy bạn).
+
+Key AI chỉ nằm ở server (route `/api/grade`), không bao giờ gửi xuống trình duyệt. Chỉ người đã đăng nhập mới gọi được.

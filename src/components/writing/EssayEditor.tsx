@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { today } from "@/lib/date";
+import { requestGrade } from "@/lib/grade-client";
 import { useProgress } from "@/lib/progress";
-import type { EssayKind } from "@/lib/types";
+import type { AiGrade, EssayKind } from "@/lib/types";
+import { GradeCard } from "../GradeCard";
 import { Button, Card } from "../ui";
 
 export const countWords = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
@@ -20,6 +22,7 @@ export function EssayEditor({
   minutes,
   minWords,
   rows = 16,
+  context,
 }: {
   kind: EssayKind;
   promptId: string;
@@ -27,12 +30,18 @@ export function EssayEditor({
   minutes: number;
   minWords: number;
   rows?: number;
+  /** Dữ liệu biểu đồ (Task 1) để AI đối chiếu số liệu */
+  context?: string;
 }) {
   const { update, updateDay } = useProgress();
   const [text, setText] = useState("");
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [savedId, setSavedId] = useState<string | null>(null);
+  const [grading, setGrading] = useState(false);
+  const [gradeError, setGradeError] = useState("");
+  const [grade, setGrade] = useState<AiGrade | null>(null);
   const words = countWords(text);
   const remaining = minutes * 60 - elapsed;
 
@@ -48,6 +57,27 @@ export function EssayEditor({
     if (words >= Math.min(minWords, 100)) updateDay((d) => void (d.manual.writing = true));
     setRunning(false);
     setSaved(true);
+    setSavedId(essay.id);
+    return essay.id;
+  }
+
+  /** Lưu bài (nếu chưa lưu) rồi gửi AI chấm; kết quả gắn vào bài đã lưu. */
+  async function gradeWithAi() {
+    const id = saved && savedId ? savedId : save();
+    setGrading(true);
+    setGradeError("");
+    try {
+      const g = await requestGrade({ type: "writing", kind, prompt, context, text, seconds: elapsed });
+      update((p) => {
+        const e = p.essays.find((x) => x.id === id);
+        if (e) e.grade = g;
+      });
+      setGrade(g);
+    } catch (e) {
+      setGradeError(e instanceof Error ? e.message : "Chấm bài thất bại.");
+    } finally {
+      setGrading(false);
+    }
   }
 
   return (
@@ -85,6 +115,8 @@ export function EssayEditor({
           setText(e.target.value);
           if (!running) setRunning(true);
           setSaved(false);
+          setSavedId(null);
+          setGrade(null);
         }}
         rows={rows}
         spellCheck={false}
@@ -95,8 +127,17 @@ export function EssayEditor({
         <Button onClick={save} disabled={words < 10}>
           💾 Lưu bài
         </Button>
+        <Button variant="outline" onClick={gradeWithAi} disabled={words < 30 || grading}>
+          {grading ? "⏳ AI đang chấm…" : "🤖 Chấm bằng AI"}
+        </Button>
         {saved && <span className="text-sm text-ok">✓ Đã lưu vào “Bài đã viết”.</span>}
       </div>
+      {gradeError && <p className="mt-2 text-sm text-bad">{gradeError}</p>}
+      {grade && (
+        <div className="mt-4">
+          <GradeCard grade={grade} />
+        </div>
+      )}
     </Card>
   );
 }

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui";
 
 /** Ghi âm bằng micro của trình duyệt để tự nghe lại. Bản ghi chỉ nằm trên máy, không tải lên đâu cả. */
-export function Recorder({ onRecorded }: { onRecorded?: () => void }) {
+export function Recorder({ onRecorded, onStart }: { onRecorded?: () => void; onStart?: () => void }) {
   const [state, setState] = useState<"idle" | "recording" | "error">("idle");
   const [url, setUrl] = useState<string | null>(null);
   const [seconds, setSeconds] = useState(0);
@@ -35,6 +35,7 @@ export function Recorder({ onRecorded }: { onRecorded?: () => void }) {
       setUrl(null);
       setSeconds(0);
       setState("recording");
+      onStart?.();
     } catch {
       setState("error");
     }

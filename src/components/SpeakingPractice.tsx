@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ANSWER_TIPS, CUE_CARDS, PART1 } from "@/content/speaking";
 import { useProgress } from "@/lib/progress";
 import { speak } from "@/lib/speech";
-import { Recorder } from "./Recorder";
+import { SpeakingAnswer } from "./SpeakingAnswer";
 import { Button, Card } from "./ui";
 
 const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
@@ -71,7 +71,7 @@ function Part1() {
           </Button>
         </div>
         <div className="mt-5">
-          <Recorder key={`${topicIdx}-${qIdx}`} />
+          <SpeakingAnswer key={`${topicIdx}-${qIdx}`} part="p1" question={question} />
         </div>
         <div className="mt-6 flex gap-2">
           <Button variant="ghost" disabled={qIdx === 0} onClick={() => setQIdx((i) => i - 1)}>
@@ -192,7 +192,7 @@ function Part2() {
             <textarea rows={3} placeholder="Ghi từ khóa ở đây…" className="mt-3 w-full rounded-lg border border-border bg-bg p-3 text-sm" />
           )}
           <div className="mt-4">
-            <Recorder key={card.id} />
+            <SpeakingAnswer key={card.id} part="p2" question={`${card.title}\nYou should say:\n- ${card.points.join("\n- ")}`} />
           </div>
         </Card>
         <Card>
@@ -208,7 +208,7 @@ function Part2() {
             ))}
           </ol>
           <div className="mt-4">
-            <Recorder key={`${card.id}-p3`} />
+            <SpeakingAnswer key={`${card.id}-p3`} part="p3" question={card.part3.join("\n")} />
           </div>
         </Card>
       </div>
